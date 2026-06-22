@@ -3,14 +3,15 @@ from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
+import os
 from dotenv import load_dotenv
 load_dotenv()
+
 
 import os
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-genai.configure(api_key=GEMINI_API_KEY)
 
 model = genai.GenerativeModel("gemini-2.5-flash")
 
@@ -109,7 +110,7 @@ def answer_question(query, docs):
 # MAIN
 
 
-text = extract_text("resume.pdfe")
+text = extract_text("resume.pdf")
 
 chunks = split_text(text)
 
