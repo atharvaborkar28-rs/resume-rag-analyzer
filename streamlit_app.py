@@ -260,7 +260,11 @@ if st.button("Extract Skills"):
 
     st.subheader("🛠 Skills")
     st.info(skills)
-    st.subheader("🎯 ATS Resume Match")
+
+
+# ATS SECTION STARTS HERE
+
+st.subheader("🎯 ATS Resume Match")
 
 job_description = st.text_area(
     "Paste Job Description Here"
