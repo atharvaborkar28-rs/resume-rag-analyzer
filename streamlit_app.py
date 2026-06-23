@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-model = genai.GenerativeModel("models/gemini-2.0-flash")
+model = genai.GenerativeModel("gemini-flash-lite-latest")
 
 st.set_page_config(
 page_title="Resume RAG Analyzer",
@@ -76,7 +76,7 @@ with st.sidebar:
 
     st.info("📄 Upload Resume")
 
-    st.info("⚡ Gemini 2.5 Flash")
+    st.info("⚡ gemini-flash-lite-latest")
 
 def extract_text(pdf_file):
 
@@ -187,7 +187,7 @@ if uploaded_file:
     if "vector_store" not in st.session_state:
       st.session_state.vector_store = create_vector_store(chunks)
 
-    vector_store = st.session_state.vector_storevector_store = create_vector_store(chunks)
+    vector_store = st.session_state.vector_store
 
     st.success("✅ FAISS Vector Store Created")
     col1, col2, col3 = st.columns(3)
@@ -238,9 +238,14 @@ if st.button("Generate Resume Summary"):
         """,
         vector_store
     )
-    if st.button("Extract Skills"):
 
-     skills = answer_question(
+    st.subheader("📋 Resume Summary")
+    st.info(summary)
+
+
+if st.button("Extract Skills"):
+
+    skills = answer_question(
         """
         Extract all technical skills from the resume.
         Group them by:
@@ -254,13 +259,32 @@ if st.button("Generate Resume Summary"):
     )
 
     st.subheader("🛠 Skills")
-
     st.info(skills)
+    st.subheader("🎯 ATS Resume Match")
 
-    st.subheader("📋 Resume Summary")
+job_description = st.text_area(
+    "Paste Job Description Here"
+)
 
-    st.info(summary)
+if uploaded_file and job_description and st.button("ATS Match Score"):
 
+    result = answer_question(
+        f"""
+        Compare the resume with this job description:
+
+        {job_description}
+
+        Give:
+        1. ATS Score out of 100
+        2. Missing Skills
+        3. Strengths
+        4. Recommendations
+        """,
+        vector_store
+    )
+
+    st.subheader("📊 ATS Analysis")
+    st.success(result)
 query = st.chat_input(
     "Ask a question about the resume..."
 )
@@ -293,17 +317,6 @@ for role, message in st.session_state.chat_history:
 
         with st.chat_message("assistant"):
             st.write(message)
-for role, message in st.session_state.chat_history:
-
-    if role == "You":
-        with st.chat_message("user"):
-            st.write(message)
-
-    else:
-        with st.chat_message("assistant"):
-            st.write(message)
-st.markdown("---")
-
 st.caption(
     "© 2026 Atharva Borkar | Resume RAG Analyzer | Powered by Gemini 2.5, LangChain & FAISS"
 )
